@@ -1,2 +1,3 @@
 # redlock-spring-boot-helper
-springboot redlock starter
+
+spring boot redLock helper

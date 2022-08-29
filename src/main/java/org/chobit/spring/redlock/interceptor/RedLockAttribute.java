@@ -1,30 +1,67 @@
 package org.chobit.spring.redlock.interceptor;
 
+import java.util.concurrent.TimeUnit;
+
+/**
+ * RedLock配置信息
+ *
+ * @author rui.zhang
+ */
 public class RedLockAttribute {
 
 
-    private String name;
+    /**
+     * RedLock Key
+     */
+    private String key;
 
-    private String methodId;
+    /**
+     * 等待时间
+     */
+    private long waitTime;
 
-    public RedLockAttribute(String name) {
-        this.name = name;
+
+    /**
+     * 持有锁的时长
+     */
+    private long leaseTime;
+
+
+    /**
+     * 时间单元
+     */
+    private TimeUnit timeUnit;
+
+
+    public String getKey() {
+        return key;
     }
 
-    public String getName() {
-        return name;
+    public void setKey(String key) {
+        this.key = key;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public long getWaitTime() {
+        return waitTime;
     }
 
-    public String getMethodId() {
-        return methodId;
+    public void setWaitTime(long waitTime) {
+        this.waitTime = waitTime;
     }
 
-    public void setMethodId(String methodId) {
-        this.methodId = methodId;
+    public long getLeaseTime() {
+        return leaseTime;
     }
 
+    public void setLeaseTime(long leaseTime) {
+        this.leaseTime = leaseTime;
+    }
+
+    public TimeUnit getTimeUnit() {
+        return timeUnit;
+    }
+
+    public void setTimeUnit(TimeUnit timeUnit) {
+        this.timeUnit = timeUnit;
+    }
 }
