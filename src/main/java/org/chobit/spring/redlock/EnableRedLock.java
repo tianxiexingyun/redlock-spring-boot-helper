@@ -9,14 +9,14 @@ import java.lang.annotation.*;
 /**
  * kafka stater annotation
  *
- * @author robin
+ * @author rui.zhang
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
 @AutoConfigurationPackage
-@Import(KafkaConfiguration.class)
+@Import(RedLockConfiguration.class)
 public @interface EnableRedLock {
 
 

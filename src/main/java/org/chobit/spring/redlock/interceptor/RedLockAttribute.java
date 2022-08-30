@@ -15,16 +15,17 @@ public class RedLockAttribute {
      */
     private String key;
 
+
     /**
      * 等待时间
      */
-    private long waitTime;
+    private Long waitTime;
 
 
     /**
      * 持有锁的时长
      */
-    private long leaseTime;
+    private Long leaseTime;
 
 
     /**
@@ -41,19 +42,19 @@ public class RedLockAttribute {
         this.key = key;
     }
 
-    public long getWaitTime() {
+    public Long getWaitTime() {
         return waitTime;
     }
 
-    public void setWaitTime(long waitTime) {
+    public void setWaitTime(Long waitTime) {
         this.waitTime = waitTime;
     }
 
-    public long getLeaseTime() {
+    public Long getLeaseTime() {
         return leaseTime;
     }
 
-    public void setLeaseTime(long leaseTime) {
+    public void setLeaseTime(Long leaseTime) {
         this.leaseTime = leaseTime;
     }
 

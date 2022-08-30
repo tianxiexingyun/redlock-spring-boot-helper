@@ -10,7 +10,7 @@ import java.lang.reflect.Method;
 /**
  * RedLock Attribute Source Pointcut
  */
-abstract class RedLockAttributeSourcePointcut extends StaticMethodMatcherPointcut implements Serializable {
+public abstract class RedLockAttributeSourcePointcut extends StaticMethodMatcherPointcut implements Serializable {
 
 
     @Override
