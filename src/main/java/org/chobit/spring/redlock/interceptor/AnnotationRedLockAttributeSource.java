@@ -18,28 +18,28 @@ import java.util.concurrent.TimeUnit;
  *
  * @author rui.zhang
  */
-public class AnnotationRedLockAttributeSource implements RedLockAttributeSource {
+public class AnnotationRedLockAttributeSource implements RedLockOperationSource {
 
 
     /**
      * 缓存
      */
-    private final Map<Object, Optional<RedLockAttribute>> attrCache =
+    private final Map<Object, Optional<RedLockOperation>> attrCache =
             new ConcurrentHashMap<>(1024);
 
 
     @Override
-    public RedLockAttribute getRedLockAttribute(Method method, Class<?> targetClass) {
+    public RedLockOperation getRedLockAttribute(Method method, Class<?> targetClass) {
 
         if (method.getDeclaringClass() == Object.class) {
             return null;
         }
 
         Object cacheKey = getCacheKey(method, targetClass);
-        Optional<RedLockAttribute> cached = attrCache.get(cacheKey);
+        Optional<RedLockOperation> cached = attrCache.get(cacheKey);
 
         if (null == cached) {
-            RedLockAttribute attr = computeRedLockAttribute(method, targetClass);
+            RedLockOperation attr = computeRedLockAttribute(method, targetClass);
             if (null == attr) {
                 attrCache.put(cacheKey, Optional.empty());
                 return null;
@@ -52,9 +52,9 @@ public class AnnotationRedLockAttributeSource implements RedLockAttributeSource 
         }
     }
 
-    private RedLockAttribute computeRedLockAttribute(Method method, Class<?> targetClass) {
+    private RedLockOperation computeRedLockAttribute(Method method, Class<?> targetClass) {
 
-        RedLockAttribute attr = computeRedLockAttribute(method);
+        RedLockOperation attr = computeRedLockAttribute(method);
         if (null != attr) {
             return attr;
         }
@@ -72,14 +72,14 @@ public class AnnotationRedLockAttributeSource implements RedLockAttributeSource 
 
 
 
-    private RedLockAttribute computeRedLockAttribute(Method method) {
+    private RedLockOperation computeRedLockAttribute(Method method) {
         if (method.getAnnotations().length > 0) {
             return parseRedLockAttribute(method);
         }
         return null;
     }
 
-    private RedLockAttribute parseRedLockAttribute(Method method) {
+    private RedLockOperation parseRedLockAttribute(Method method) {
         AnnotationAttributes attributes =
                 AnnotatedElementUtils.getMergedAnnotationAttributes(method, RedLock.class);
         if (null != attributes) {
@@ -89,13 +89,13 @@ public class AnnotationRedLockAttributeSource implements RedLockAttributeSource 
         }
     }
 
-    private RedLockAttribute parseRedLockAttribute(AnnotationAttributes attributes) {
+    private RedLockOperation parseRedLockAttribute(AnnotationAttributes attributes) {
         String key = attributes.getString("key");
         Long waitTime = attributes.getNumber("waitTime");
         Long leaseTime = attributes.getNumber("leaseTime");
         TimeUnit unit = (TimeUnit) attributes.get("timeUnit");
 
-        RedLockAttribute attr = new RedLockAttribute();
+        RedLockOperation attr = new RedLockOperation();
         attr.setKey(key);
         attr.setWaitTime(waitTime);
         attr.setLeaseTime(leaseTime);

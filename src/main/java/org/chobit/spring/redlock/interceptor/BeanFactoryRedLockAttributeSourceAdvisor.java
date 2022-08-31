@@ -12,18 +12,18 @@ import org.springframework.lang.Nullable;
 public class BeanFactoryRedLockAttributeSourceAdvisor extends AbstractBeanFactoryPointcutAdvisor {
 
     @Nullable
-    private RedLockAttributeSource redLockAttributeSource;
+    private RedLockOperationSource redLockAttributeSource;
 
 
-    private final RedLockAttributeSourcePointcut pointcut = new RedLockAttributeSourcePointcut() {
+    private final RedLockOperationSourcePointcut pointcut = new RedLockOperationSourcePointcut() {
         @Override
-        protected RedLockAttributeSource getRedLockAttributeSource() {
+        protected RedLockOperationSource getRedLockAttributeSource() {
             return redLockAttributeSource;
         }
     };
 
 
-    public void setRedLockAttributeSource(RedLockAttributeSource redLockAttributeSource) {
+    public void setRedLockAttributeSource(RedLockOperationSource redLockAttributeSource) {
         this.redLockAttributeSource = redLockAttributeSource;
     }
 

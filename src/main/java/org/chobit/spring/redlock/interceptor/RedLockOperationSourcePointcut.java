@@ -8,14 +8,16 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 
 /**
- * RedLock Attribute Source Pointcut
+ * A Pointcut that matches if the underlying {@link RedLockOperationSource} has an attribute for a given method.
+ *
+ * @author rui.zhang
  */
-public abstract class RedLockAttributeSourcePointcut extends StaticMethodMatcherPointcut implements Serializable {
+public abstract class RedLockOperationSourcePointcut extends StaticMethodMatcherPointcut implements Serializable {
 
 
     @Override
     public boolean matches(Method method, Class<?> targetClass) {
-        RedLockAttributeSource was = getRedLockAttributeSource();
+        RedLockOperationSource was = getRedLockAttributeSource();
         return (null != was && null != was.getRedLockAttribute(method, targetClass));
     }
 
@@ -25,17 +27,17 @@ public abstract class RedLockAttributeSourcePointcut extends StaticMethodMatcher
         if (this == other) {
             return true;
         }
-        if (!(other instanceof RedLockAttributeSourcePointcut)) {
+        if (!(other instanceof RedLockOperationSourcePointcut)) {
             return false;
         }
-        RedLockAttributeSourcePointcut otherPc = (RedLockAttributeSourcePointcut) other;
+        RedLockOperationSourcePointcut otherPc = (RedLockOperationSourcePointcut) other;
         return ObjectUtils.nullSafeEquals(this.getRedLockAttributeSource(), otherPc.getRedLockAttributeSource());
     }
 
 
     @Override
     public int hashCode() {
-        return RedLockAttributeSourcePointcut.class.hashCode();
+        return RedLockOperationSourcePointcut.class.hashCode();
     }
 
     @Override
@@ -50,6 +52,6 @@ public abstract class RedLockAttributeSourcePointcut extends StaticMethodMatcher
      * @return RedLock Attribute 源
      */
     @Nullable
-    protected abstract RedLockAttributeSource getRedLockAttributeSource();
+    protected abstract RedLockOperationSource getRedLockAttributeSource();
 
 }

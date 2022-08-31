@@ -7,15 +7,13 @@ import org.springframework.lang.Nullable;
 
 import java.lang.reflect.Method;
 
-import static jodd.util.StringUtil.isNotBlank;
-
 /**
  * @author rui.zhang
  */
 abstract class RedLockAspectSupport implements BeanFactoryAware, InitializingBean {
 
 
-    private RedLockAttributeSource attrSource;
+    private RedLockOperationSource attrSource;
 
     @Nullable
     private BeanFactory beanFactory;
@@ -34,11 +32,11 @@ abstract class RedLockAspectSupport implements BeanFactoryAware, InitializingBea
     }
 
 
-    public RedLockAttributeSource getAttrSource() {
+    public RedLockOperationSource getAttrSource() {
         return attrSource;
     }
 
-    public void setAttrSource(RedLockAttributeSource attrSource) {
+    public void setAttrSource(RedLockOperationSource attrSource) {
         this.attrSource = attrSource;
     }
 

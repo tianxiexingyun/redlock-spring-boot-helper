@@ -3,11 +3,11 @@ package org.chobit.spring.redlock.interceptor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * RedLock配置信息
+ * Base class for redLock operations
  *
  * @author rui.zhang
  */
-public class RedLockAttribute {
+public class RedLockOperation {
 
 
     /**

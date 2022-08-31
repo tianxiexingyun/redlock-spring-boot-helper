@@ -2,7 +2,7 @@ package org.chobit.spring.redlock;
 
 import org.chobit.spring.redlock.interceptor.AnnotationRedLockAttributeSource;
 import org.chobit.spring.redlock.interceptor.BeanFactoryRedLockAttributeSourceAdvisor;
-import org.chobit.spring.redlock.interceptor.RedLockAttributeSource;
+import org.chobit.spring.redlock.interceptor.RedLockOperationSource;
 import org.chobit.spring.redlock.interceptor.RedLockInterceptor;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
@@ -84,7 +84,7 @@ public class RedLockConfiguration {
 
     @Bean
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-    public RedLockAttributeSource watcherAttributeSource() {
+    public RedLockOperationSource watcherAttributeSource() {
         return new AnnotationRedLockAttributeSource();
     }
 
