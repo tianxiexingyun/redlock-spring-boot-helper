@@ -17,7 +17,7 @@ public abstract class RedLockOperationSourcePointcut extends StaticMethodMatcher
 
     @Override
     public boolean matches(Method method, Class<?> targetClass) {
-        RedLockOperationSource was = getRedLockAttributeSource();
+        RedLockOperationSource was = getRedLockOperationSource();
         return (null != was && null != was.getRedLockAttribute(method, targetClass));
     }
 
@@ -31,7 +31,7 @@ public abstract class RedLockOperationSourcePointcut extends StaticMethodMatcher
             return false;
         }
         RedLockOperationSourcePointcut otherPc = (RedLockOperationSourcePointcut) other;
-        return ObjectUtils.nullSafeEquals(this.getRedLockAttributeSource(), otherPc.getRedLockAttributeSource());
+        return ObjectUtils.nullSafeEquals(this.getRedLockOperationSource(), otherPc.getRedLockOperationSource());
     }
 
 
@@ -42,7 +42,7 @@ public abstract class RedLockOperationSourcePointcut extends StaticMethodMatcher
 
     @Override
     public String toString() {
-        return getClass().getName() + ": " + getRedLockAttributeSource();
+        return getClass().getName() + ": " + getRedLockOperationSource();
     }
 
 
@@ -52,6 +52,6 @@ public abstract class RedLockOperationSourcePointcut extends StaticMethodMatcher
      * @return RedLock Attribute 源
      */
     @Nullable
-    protected abstract RedLockOperationSource getRedLockAttributeSource();
+    protected abstract RedLockOperationSource getRedLockOperationSource();
 
 }

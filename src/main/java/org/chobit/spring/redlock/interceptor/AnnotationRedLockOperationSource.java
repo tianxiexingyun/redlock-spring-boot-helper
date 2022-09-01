@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author rui.zhang
  */
-public class AnnotationRedLockAttributeSource implements RedLockOperationSource {
+public class AnnotationRedLockOperationSource implements RedLockOperationSource {
 
 
     /**

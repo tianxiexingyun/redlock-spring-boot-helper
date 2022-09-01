@@ -1,9 +1,9 @@
 package org.chobit.spring.redlock;
 
-import org.chobit.spring.redlock.interceptor.AnnotationRedLockAttributeSource;
-import org.chobit.spring.redlock.interceptor.BeanFactoryRedLockAttributeSourceAdvisor;
-import org.chobit.spring.redlock.interceptor.RedLockOperationSource;
+import org.chobit.spring.redlock.interceptor.AnnotationRedLockOperationSource;
+import org.chobit.spring.redlock.interceptor.BeanFactoryRedLockOperationSourceAdvisor;
 import org.chobit.spring.redlock.interceptor.RedLockInterceptor;
+import org.chobit.spring.redlock.interceptor.RedLockOperationSource;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.ClusterServersConfig;
@@ -18,7 +18,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Role;
 
 import java.util.List;
-
 
 import static jodd.util.StringUtil.isNotBlank;
 
@@ -84,26 +83,27 @@ public class RedLockConfiguration {
 
     @Bean
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-    public RedLockOperationSource watcherAttributeSource() {
-        return new AnnotationRedLockAttributeSource();
+    public RedLockOperationSource redLockOperationSource() {
+        return new AnnotationRedLockOperationSource();
     }
 
 
     @Bean
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-    public RedLockInterceptor redLockInterceptor(RedisProperties properties) {
+    public RedLockInterceptor redLockInterceptor(RedLockOperationSource redLockOperationSource) {
         RedLockInterceptor interceptor = new RedLockInterceptor();
-        interceptor.setAttrSource(watcherAttributeSource());
+        interceptor.setAttrSource(redLockOperationSource);
         return interceptor;
     }
 
 
     @Bean
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-    public BeanFactoryRedLockAttributeSourceAdvisor redLockAdvisor(RedisProperties properties) {
-        BeanFactoryRedLockAttributeSourceAdvisor advisor = new BeanFactoryRedLockAttributeSourceAdvisor();
-        advisor.setRedLockAttributeSource(watcherAttributeSource());
-        advisor.setAdvice(redLockInterceptor(properties));
+    public BeanFactoryRedLockOperationSourceAdvisor redLockAdvisor(RedLockInterceptor redLockInterceptor,
+                                                                   RedLockOperationSource redLockOperationSource) {
+        BeanFactoryRedLockOperationSourceAdvisor advisor = new BeanFactoryRedLockOperationSourceAdvisor();
+        advisor.setRedLockOperationSource(redLockOperationSource);
+        advisor.setAdvice(redLockInterceptor);
         return advisor;
     }
 

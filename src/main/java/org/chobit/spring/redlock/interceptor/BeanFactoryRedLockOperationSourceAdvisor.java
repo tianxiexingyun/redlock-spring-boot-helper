@@ -3,28 +3,29 @@ package org.chobit.spring.redlock.interceptor;
 import org.springframework.aop.ClassFilter;
 import org.springframework.aop.Pointcut;
 import org.springframework.aop.support.AbstractBeanFactoryPointcutAdvisor;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
 
 /**
  * @author rui.zhang
  */
-public class BeanFactoryRedLockAttributeSourceAdvisor extends AbstractBeanFactoryPointcutAdvisor {
+public class BeanFactoryRedLockOperationSourceAdvisor extends AbstractBeanFactoryPointcutAdvisor {
 
     @Nullable
-    private RedLockOperationSource redLockAttributeSource;
+    private RedLockOperationSource redLockOperationSource;
 
 
     private final RedLockOperationSourcePointcut pointcut = new RedLockOperationSourcePointcut() {
         @Override
-        protected RedLockOperationSource getRedLockAttributeSource() {
-            return redLockAttributeSource;
+        protected RedLockOperationSource getRedLockOperationSource() {
+            return redLockOperationSource;
         }
     };
 
 
-    public void setRedLockAttributeSource(RedLockOperationSource redLockAttributeSource) {
-        this.redLockAttributeSource = redLockAttributeSource;
+    public void setRedLockOperationSource(RedLockOperationSource redLockOperationSource) {
+        this.redLockOperationSource = redLockOperationSource;
     }
 
 
@@ -33,6 +34,7 @@ public class BeanFactoryRedLockAttributeSourceAdvisor extends AbstractBeanFactor
     }
 
 
+    @NonNull
     @Override
     public Pointcut getPointcut() {
         return this.pointcut;
