@@ -21,4 +21,8 @@ public class RedLockInterceptor extends RedLockAspectSupport implements MethodIn
         return redLockInvoke(invocation.getMethod(), targetClass, invocation::proceed);
     }
 
+    @Override
+    public void afterSingletonsInstantiated() {
+
+    }
 }

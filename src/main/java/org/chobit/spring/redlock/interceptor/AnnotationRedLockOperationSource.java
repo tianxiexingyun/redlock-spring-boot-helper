@@ -7,6 +7,7 @@ import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.util.ClassUtils;
 
+import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Optional;
@@ -14,11 +15,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
- * RedLock 注解属性源
+ * Implementation of the {@link RedLockOperationSource} interface
+ * for working with caching metadata in annotation format.
+ *
+ * <p>This class reads Spring's {@link RedLock} annotations
+ * and exposes corresponding redLock operation definition to Spring's infrastructure.
+ * This class may also serve as base class for a custom {@link RedLockOperationSource}.
  *
  * @author rui.zhang
  */
-public class AnnotationRedLockOperationSource implements RedLockOperationSource {
+public class AnnotationRedLockOperationSource implements RedLockOperationSource, Serializable {
 
 
     /**
@@ -69,7 +75,6 @@ public class AnnotationRedLockOperationSource implements RedLockOperationSource 
         }
         return null;
     }
-
 
 
     private RedLockOperation computeRedLockAttribute(Method method) {

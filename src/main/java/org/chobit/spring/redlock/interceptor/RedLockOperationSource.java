@@ -2,14 +2,17 @@ package org.chobit.spring.redlock.interceptor;
 
 import org.springframework.lang.Nullable;
 
+import java.io.Serializable;
 import java.lang.reflect.Method;
 
 /**
- * Interface used by {@link RedLockInterceptor}. Implementations know how to source redlock attributes, whether from configuration, metadata attributes at source level, or elsewhere.
+ * Interface used by {@link RedLockInterceptor}.
+ * Implementations know how to source redLock attributes,
+ * whether from configuration, metadata attributes at source level, or elsewhere.
  *
  * @author rui.zhang
  */
-public interface RedLockOperationSource {
+public interface RedLockOperationSource extends Serializable {
 
 
     /**
