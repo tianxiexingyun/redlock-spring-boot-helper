@@ -14,21 +14,29 @@ public interface RedLockOperationInvocationContext {
 
     /**
      * Return the redLock operation.
+     *
+     * @return The redLock operation
      */
     RedLockOperation getOperation();
 
     /**
      * Return the target instance on which the method was invoked.
+     *
+     * @return The target instance
      */
     Object getTarget();
 
     /**
      * Return the method which was invoked.
+     *
+     * @return The method
      */
     Method getMethod();
 
     /**
      * Return the argument list used to invoke the method.
+     *
+     * @return The argument list
      */
     Object[] getArgs();
 

@@ -73,6 +73,8 @@ abstract class RedLockAspectSupport implements BeanFactoryAware, InitializingBea
      * Set the default {@link KeyGenerator} that this redLock aspect should delegate to
      * if no specific key generator has been set for the operation.
      * <p>The default is a {@link SimpleKeyGenerator}.
+     *
+     * @param keyGenerator A {@link KeyGenerator}
      */
     public void setKeyGenerator(KeyGenerator keyGenerator) {
         this.keyGenerator = SingletonSupplier.of(keyGenerator);
@@ -80,6 +82,8 @@ abstract class RedLockAspectSupport implements BeanFactoryAware, InitializingBea
 
     /**
      * Return the default {@link KeyGenerator} that this redLock aspect delegates to.
+     *
+     * @return The default {@link KeyGenerator}
      */
     public KeyGenerator getKeyGenerator() {
         return this.keyGenerator.obtain();

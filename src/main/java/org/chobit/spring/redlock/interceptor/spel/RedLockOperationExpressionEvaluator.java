@@ -51,6 +51,7 @@ public class RedLockOperationExpressionEvaluator extends CachedExpressionEvaluat
      * @param targetClass the target class
      * @param result      the return value (can be {@code null}) or
      *                    {@link #NO_RESULT} if there is no return at this time
+     * @param beanFactory the bean factory
      * @return the evaluation context
      */
     public EvaluationContext createEvaluationContext(Method method,

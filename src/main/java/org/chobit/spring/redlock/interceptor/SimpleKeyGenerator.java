@@ -14,7 +14,6 @@ import java.lang.reflect.Method;
 public class SimpleKeyGenerator implements KeyGenerator {
 
 
-
     @Override
     public Object generate(Object target, Method method, Object... params) {
         return generateKey(params);
@@ -22,6 +21,9 @@ public class SimpleKeyGenerator implements KeyGenerator {
 
     /**
      * Generate a key based on the specified parameters.
+     *
+     * @param params The specified parameters
+     * @return The key
      */
     public static Object generateKey(Object... params) {
         if (params.length == 0) {
@@ -35,11 +37,6 @@ public class SimpleKeyGenerator implements KeyGenerator {
         }
         return new SimpleKey(params);
     }
-
-
-
-
-
 
 
 }

@@ -15,7 +15,7 @@ import java.util.Set;
  * <p>Also define a set of "unavailable variables" (i.e. variables that should lead to an exception right the way when they are accessed).
  * This can be useful to verify a condition does not match even when not all potential variables are present.
  *
- * <a>To limit the creation of objects, an ugly constructor is used (rather than a dedicated 'closure'-like class for deferred execution).
+ * <p>To limit the creation of objects, an ugly constructor is used (rather than a dedicated 'closure'-like class for deferred execution).
  *
  * @author rui.zhang
  */
@@ -39,6 +39,8 @@ public class RedLockEvaluationContext extends MethodBasedEvaluationContext {
      * <p>This permits the validation of expressions that could potentially a
      * variable even when such variable isn't available yet. Any expression
      * trying to use that variable should therefore fail to evaluate.
+     *
+     * @param name a variable name
      */
     public void addUnavailableVariable(String name) {
         this.unavailableVariables.add(name);
@@ -47,10 +49,12 @@ public class RedLockEvaluationContext extends MethodBasedEvaluationContext {
 
     /**
      * Load the param information only when needed.
+     *
+     * @param name param name
      */
     @Override
     @Nullable
-    public Object lookupVariable(String name) {
+    public Object lookupVariable(@Nullable String name) {
         if (this.unavailableVariables.contains(name)) {
             // TODO
             // throw new VariableNotAvailableException(name);
