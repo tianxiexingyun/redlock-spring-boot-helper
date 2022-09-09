@@ -2,9 +2,10 @@ package org.chobit.spring.redlock.interceptor;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.springframework.aop.support.AopUtils;
+import org.springframework.cache.interceptor.CacheOperationInvoker;
 
 import java.io.Serializable;
+import java.lang.reflect.Method;
 
 
 /**
@@ -17,12 +18,19 @@ public class RedLockInterceptor extends RedLockAspectSupport implements MethodIn
 
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
-        Class<?> targetClass = (invocation.getThis() != null ? AopUtils.getTargetClass(invocation.getThis()) : null);
-        return redLockInvoke(invocation.getMethod(), targetClass, invocation::proceed);
-    }
-
-    @Override
-    public void afterSingletonsInstantiated() {
-
+        Method method = invocation.getMethod();
+        RedLockOperationInvoker invoker = () -> {
+            try {
+                return invocation.proceed();
+            } catch (Throwable t) {
+                throw new RedLockOperationInvoker.ThrowableWrapper(t);
+            }
+        };
+        
+        try {
+            return execute(invoker, invocation.getThis(), method, invocation.getArguments());
+        } catch (CacheOperationInvoker.ThrowableWrapper th) {
+            throw th.getOriginal();
+        }
     }
 }

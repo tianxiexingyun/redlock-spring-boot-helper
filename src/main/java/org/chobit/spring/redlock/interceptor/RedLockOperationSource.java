@@ -23,6 +23,6 @@ public interface RedLockOperationSource extends Serializable {
      * @return RedLock相关属性
      */
     @Nullable
-    RedLockOperation getRedLockAttribute(Method method, @Nullable Class<?> targetClass);
+    RedLockOperation getRedLockOperation(Method method, @Nullable Class<?> targetClass);
 
 }

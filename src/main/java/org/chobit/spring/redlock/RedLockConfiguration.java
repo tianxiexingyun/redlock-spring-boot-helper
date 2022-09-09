@@ -92,7 +92,7 @@ public class RedLockConfiguration {
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
     public RedLockInterceptor redLockInterceptor(RedLockOperationSource redLockOperationSource) {
         RedLockInterceptor interceptor = new RedLockInterceptor();
-        interceptor.setAttrSource(redLockOperationSource);
+        interceptor.setRedLockOperationSource(redLockOperationSource);
         return interceptor;
     }
 

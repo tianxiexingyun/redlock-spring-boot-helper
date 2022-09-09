@@ -24,7 +24,7 @@ public class BeanFactoryRedLockOperationSourceAdvisor extends AbstractBeanFactor
     };
 
 
-    public void setRedLockOperationSource(RedLockOperationSource redLockOperationSource) {
+    public void setRedLockOperationSource(@Nullable RedLockOperationSource redLockOperationSource) {
         this.redLockOperationSource = redLockOperationSource;
     }
 

@@ -35,7 +35,7 @@ public class AnnotationRedLockOperationSource implements RedLockOperationSource,
 
 
     @Override
-    public RedLockOperation getRedLockAttribute(Method method, Class<?> targetClass) {
+    public RedLockOperation getRedLockOperation(Method method, Class<?> targetClass) {
 
         if (method.getDeclaringClass() == Object.class) {
             return null;
