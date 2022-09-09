@@ -108,7 +108,7 @@ abstract class RedLockAspectSupport implements BeanFactoryAware, InitializingBea
         if (null != operationSource) {
             RedLockOperation operation = operationSource.getRedLockOperation(method, targetClass);
             RedLockOperationContext context = createOperationContext(operation, method, args, target, targetClass);
-            return execute(invoker, target, method, args);
+            return execute(invoker, context);
         }
         return invoker.invoke();
     }
