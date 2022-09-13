@@ -1,5 +1,6 @@
 package org.chobit.spring.redlock.interceptor;
 
+import org.chobit.spring.redlock.exception.RedLockException;
 import org.chobit.spring.redlock.interceptor.spel.RedLockOperationExpressionEvaluator;
 import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.aop.support.AopUtils;
@@ -11,14 +12,12 @@ import org.springframework.context.expression.AnnotatedElementKey;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
-import org.springframework.util.function.SingletonSupplier;
 
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.chobit.spring.redlock.interceptor.spel.RedLockOperationExpressionEvaluator.NO_RESULT;
+import static jodd.util.StringUtil.isBlank;
 
 /**
  * Base class for redLock aspects, such as the {@link RedLockInterceptor} or an AspectJ aspect.
@@ -26,8 +25,7 @@ import static org.chobit.spring.redlock.interceptor.spel.RedLockOperationExpress
  * <p>
  * Subclasses are responsible for calling relevant methods in the correct order.
  * <p>
- * Uses the Strategy design pattern. A {@link RedLockOperationSource} is used for determining caching operations,
- * a {@link KeyGenerator} will build the redLock keys.
+ * Uses the Strategy design pattern. A {@link RedLockOperationSource} is used for determining caching operations.
  *
  * @author rui.zhang
  */
@@ -39,9 +37,6 @@ abstract class RedLockAspectSupport implements BeanFactoryAware, InitializingBea
     private final RedLockOperationExpressionEvaluator evaluator = new RedLockOperationExpressionEvaluator();
 
     private RedLockOperationSource redLockOperationSource;
-
-
-    private SingletonSupplier<KeyGenerator> keyGenerator = SingletonSupplier.of(SimpleKeyGenerator::new);
 
     @Nullable
     private BeanFactory beanFactory;
@@ -66,27 +61,6 @@ abstract class RedLockAspectSupport implements BeanFactoryAware, InitializingBea
 
     public void setRedLockOperationSource(RedLockOperationSource redLockOperationSource) {
         this.redLockOperationSource = redLockOperationSource;
-    }
-
-
-    /**
-     * Set the default {@link KeyGenerator} that this redLock aspect should delegate to
-     * if no specific key generator has been set for the operation.
-     * <p>The default is a {@link SimpleKeyGenerator}.
-     *
-     * @param keyGenerator A {@link KeyGenerator}
-     */
-    public void setKeyGenerator(KeyGenerator keyGenerator) {
-        this.keyGenerator = SingletonSupplier.of(keyGenerator);
-    }
-
-    /**
-     * Return the default {@link KeyGenerator} that this redLock aspect delegates to.
-     *
-     * @return The default {@link KeyGenerator}
-     */
-    public KeyGenerator getKeyGenerator() {
-        return this.keyGenerator.obtain();
     }
 
 
@@ -119,17 +93,19 @@ abstract class RedLockAspectSupport implements BeanFactoryAware, InitializingBea
     }
 
     private Object execute(final RedLockOperationInvoker invoker, RedLockOperationContext context) {
-        Object key = generateKey(context, NO_RESULT);
+        Object key = generateKey(context);
+        long start = System.currentTimeMillis();
         try {
             return invoker.invoke();
         } finally {
             System.out.println(key);
+            System.out.println("Duration : " + (System.currentTimeMillis() - start));
         }
     }
 
 
-    private Object generateKey(RedLockOperationContext context, @Nullable Object result) {
-        Object key = context.generateKey(result);
+    private Object generateKey(RedLockOperationContext context) {
+        Object key = context.generateKey();
         if (null == key) {
             throw new IllegalArgumentException("Null key returned for redLock operation (maybe you are " +
                     "using named params on classes without debug info?) " + context.metadata.operation);
@@ -164,8 +140,7 @@ abstract class RedLockAspectSupport implements BeanFactoryAware, InitializingBea
         RedLockOperationKey operationKey = new RedLockOperationKey(operation, method, targetClass);
         RedLockOperationMetadata metadata = this.metadataCache.get(operationKey);
         if (null == metadata) {
-            KeyGenerator operationKeyGenerator = getKeyGenerator();
-            metadata = new RedLockOperationMetadata(operation, method, targetClass, operationKeyGenerator);
+            metadata = new RedLockOperationMetadata(operation, method, targetClass);
             this.metadataCache.put(operationKey, metadata);
         }
         return metadata;
@@ -232,26 +207,22 @@ abstract class RedLockAspectSupport implements BeanFactoryAware, InitializingBea
 
         private final AnnotatedElementKey methodKey;
 
-        private final KeyGenerator keyGenerator;
-
         public RedLockOperationMetadata(RedLockOperation operation,
                                         Method method,
-                                        Class<?> targetClass,
-                                        KeyGenerator keyGenerator) {
+                                        Class<?> targetClass) {
             this.operation = operation;
             this.method = method;
             this.targetClass = targetClass;
             this.targetMethod = (!Proxy.isProxyClass(targetClass) ? AopUtils.getMostSpecificMethod(method, targetClass) : this.method);
             this.methodKey = new AnnotatedElementKey(this.targetMethod, targetClass);
-            this.keyGenerator = keyGenerator;
         }
     }
 
 
     /**
-     * A {@link RedLockOperationInvocationContext} context for a {@link RedLockOperation}.
+     * A context for a {@link RedLockOperation}.
      */
-    protected class RedLockOperationContext implements RedLockOperationInvocationContext {
+    protected class RedLockOperationContext {
 
         private final RedLockOperationMetadata metadata;
 
@@ -259,33 +230,10 @@ abstract class RedLockAspectSupport implements BeanFactoryAware, InitializingBea
 
         private final Object target;
 
-        @Nullable
-        private Boolean conditionPassing;
-
         public RedLockOperationContext(RedLockOperationMetadata metadata, Object[] args, Object target) {
             this.metadata = metadata;
             this.args = extractArgs(metadata.method, args);
             this.target = target;
-        }
-
-        @Override
-        public RedLockOperation getOperation() {
-            return this.metadata.operation;
-        }
-
-        @Override
-        public Object getTarget() {
-            return this.target;
-        }
-
-        @Override
-        public Method getMethod() {
-            return this.metadata.method;
-        }
-
-        @Override
-        public Object[] getArgs() {
-            return this.args;
         }
 
         private Object[] extractArgs(Method method, Object[] args) {
@@ -303,17 +251,17 @@ abstract class RedLockAspectSupport implements BeanFactoryAware, InitializingBea
          * Compute the key for the given caching operation.
          */
         @Nullable
-        protected Object generateKey(@Nullable Object result) {
-            if (StringUtils.hasText(this.metadata.operation.getKey())) {
-                EvaluationContext evaluationContext = createEvaluationContext(result);
-                return evaluator.key(this.metadata.operation.getKey(), this.metadata.methodKey, evaluationContext);
+        protected Object generateKey() {
+            if (isBlank(this.metadata.operation.getKey())) {
+                throw new RedLockException("The key for redLock is blank.");
             }
-            return this.metadata.keyGenerator.generate(this.target, this.metadata.method, this.args);
+            EvaluationContext evaluationContext = createEvaluationContext();
+            return evaluator.key(this.metadata.operation.getKey(), this.metadata.methodKey, evaluationContext);
         }
 
-        private EvaluationContext createEvaluationContext(@Nullable Object result) {
+        private EvaluationContext createEvaluationContext() {
             return evaluator.createEvaluationContext(this.metadata.method, this.args,
-                    this.target, this.metadata.targetClass, this.metadata.targetMethod, result, beanFactory);
+                    this.target, this.metadata.targetClass, this.metadata.targetMethod, beanFactory);
         }
     }
 

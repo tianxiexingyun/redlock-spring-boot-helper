@@ -1,6 +1,7 @@
 package org.chobit.spring.redlock.interceptor;
 
 import org.springframework.aop.support.StaticMethodMatcherPointcut;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ObjectUtils;
 
@@ -16,7 +17,7 @@ public abstract class RedLockOperationSourcePointcut extends StaticMethodMatcher
 
 
     @Override
-    public boolean matches(Method method, Class<?> targetClass) {
+    public boolean matches(@NonNull Method method, @NonNull Class<?> targetClass) {
         RedLockOperationSource was = getRedLockOperationSource();
         return (null != was && null != was.getRedLockOperation(method, targetClass));
     }

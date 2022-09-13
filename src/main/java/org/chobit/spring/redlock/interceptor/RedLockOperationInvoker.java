@@ -28,7 +28,6 @@ public interface RedLockOperationInvoker {
     /**
      * Wrap any exception thrown while invoking {@link #invoke()}.
      */
-    @SuppressWarnings("serial")
     class ThrowableWrapper extends RuntimeException {
 
         private final Throwable original;

@@ -42,19 +42,18 @@ public class AnnotationRedLockOperationSource implements RedLockOperationSource,
         }
 
         Object cacheKey = getCacheKey(method, targetClass);
-        Optional<RedLockOperation> cached = attrCache.get(cacheKey);
 
-        if (null == cached) {
+        if (attrCache.containsKey(cacheKey)) {
             RedLockOperation attr = computeRedLockAttribute(method, targetClass);
             if (null == attr) {
                 attrCache.put(cacheKey, Optional.empty());
                 return null;
             }
-
             attrCache.put(cacheKey, Optional.of(attr));
             return attr;
         } else {
-            return cached.orElse(null);
+            Optional<RedLockOperation> opt = attrCache.get(cacheKey);
+            return opt.orElse(null);
         }
     }
 

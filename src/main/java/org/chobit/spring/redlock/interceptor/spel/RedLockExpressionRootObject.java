@@ -20,7 +20,6 @@ public class RedLockExpressionRootObject {
 
 
     public RedLockExpressionRootObject(Method method, Object[] args, Object target, Class<?> targetClass) {
-
         this.method = method;
         this.target = target;
         this.targetClass = targetClass;
