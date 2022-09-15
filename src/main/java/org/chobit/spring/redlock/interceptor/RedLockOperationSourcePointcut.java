@@ -18,8 +18,8 @@ public abstract class RedLockOperationSourcePointcut extends StaticMethodMatcher
 
     @Override
     public boolean matches(@NonNull Method method, @NonNull Class<?> targetClass) {
-        RedLockOperationSource was = getRedLockOperationSource();
-        return (null != was && null != was.getRedLockOperation(method, targetClass));
+        RedLockOperationSource ros = getRedLockOperationSource();
+        return (null != ros && null != ros.getRedLockOperation(method, targetClass));
     }
 
 

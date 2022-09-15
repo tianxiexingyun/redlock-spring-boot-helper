@@ -17,22 +17,22 @@ public interface RedLockOperationInvoker {
 
     /**
      * Invoke the cache operation defined by this instance. Wraps any exception
-     * that is thrown during the invocation in a {@link RedLockOperationInvoker.ThrowableWrapper}.
+     * that is thrown during the invocation in a {@link WrappedThrowableException}.
      *
      * @return the result of the operation
-     * @throws RedLockOperationInvoker.ThrowableWrapper if an error occurred while invoking the operation
+     * @throws WrappedThrowableException if an error occurred while invoking the operation
      */
-    Object invoke() throws ThrowableWrapper;
+    Object invoke() throws WrappedThrowableException;
 
 
     /**
      * Wrap any exception thrown while invoking {@link #invoke()}.
      */
-    class ThrowableWrapper extends RuntimeException {
+    class WrappedThrowableException extends RuntimeException {
 
         private final Throwable original;
 
-        public ThrowableWrapper(Throwable original) {
+        public WrappedThrowableException(Throwable original) {
             super(original.getMessage(), original);
             this.original = original;
         }

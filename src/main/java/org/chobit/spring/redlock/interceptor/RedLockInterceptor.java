@@ -23,7 +23,7 @@ public class RedLockInterceptor extends RedLockAspectSupport implements MethodIn
             try {
                 return invocation.proceed();
             } catch (Throwable t) {
-                throw new RedLockOperationInvoker.ThrowableWrapper(t);
+                throw new RedLockOperationInvoker.WrappedThrowableException(t);
             }
         };
         

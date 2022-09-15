@@ -1,6 +1,5 @@
 package org.chobit.spring.redlock.interceptor;
 
-import org.springframework.aop.ClassFilter;
 import org.springframework.aop.Pointcut;
 import org.springframework.aop.support.AbstractBeanFactoryPointcutAdvisor;
 import org.springframework.lang.NonNull;
@@ -26,11 +25,6 @@ public class BeanFactoryRedLockOperationSourceAdvisor extends AbstractBeanFactor
 
     public void setRedLockOperationSource(@Nullable RedLockOperationSource redLockOperationSource) {
         this.redLockOperationSource = redLockOperationSource;
-    }
-
-
-    public void setClassFilter(ClassFilter classFilter) {
-        this.pointcut.setClassFilter(classFilter);
     }
 
 
