@@ -47,4 +47,12 @@ public @interface RedLock {
     TimeUnit timeUnit() default TimeUnit.SECONDS;
 
 
+    /**
+     * 最终是否需要释放锁
+     *
+     * @return 是否需要释放锁
+     */
+    boolean finallyRelease() default true;
+
+
 }

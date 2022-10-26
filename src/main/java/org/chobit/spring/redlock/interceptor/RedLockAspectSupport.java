@@ -2,6 +2,10 @@ package org.chobit.spring.redlock.interceptor;
 
 import org.chobit.spring.redlock.exception.RedLockException;
 import org.chobit.spring.redlock.interceptor.spel.RedLockOperationExpressionEvaluator;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.BeanFactory;
@@ -16,6 +20,7 @@ import org.springframework.util.ObjectUtils;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import static jodd.util.StringUtil.isBlank;
 
@@ -32,6 +37,8 @@ import static jodd.util.StringUtil.isBlank;
 abstract class RedLockAspectSupport implements BeanFactoryAware, InitializingBean {
 
 
+    private static final Logger logger = LoggerFactory.getLogger(RedLockAspectSupport.class);
+
     private final Map<RedLockOperationKey, RedLockOperationMetadata> metadataCache = new ConcurrentHashMap<>(1024);
 
     private final RedLockOperationExpressionEvaluator evaluator = new RedLockOperationExpressionEvaluator();
@@ -41,6 +48,8 @@ abstract class RedLockAspectSupport implements BeanFactoryAware, InitializingBea
     @Nullable
     private BeanFactory beanFactory;
 
+    private RedissonClient redissonClient;
+
     public RedLockAspectSupport() {
     }
 
@@ -48,12 +57,6 @@ abstract class RedLockAspectSupport implements BeanFactoryAware, InitializingBea
     public void setBeanFactory(@Nullable BeanFactory beanFactory) {
         this.beanFactory = beanFactory;
     }
-
-    @Nullable
-    protected final BeanFactory getBeanFactory() {
-        return this.beanFactory;
-    }
-
 
     public RedLockOperationSource getRedLockOperationSource() {
         return redLockOperationSource;
@@ -63,6 +66,9 @@ abstract class RedLockAspectSupport implements BeanFactoryAware, InitializingBea
         this.redLockOperationSource = redLockOperationSource;
     }
 
+    public void setRedissonClient(RedissonClient redissonClient) {
+        this.redissonClient = redissonClient;
+    }
 
     @Override
     public void afterPropertiesSet() {
@@ -82,7 +88,7 @@ abstract class RedLockAspectSupport implements BeanFactoryAware, InitializingBea
         if (null != operationSource) {
             RedLockOperation operation = operationSource.getRedLockOperation(method, targetClass);
             RedLockOperationContext context = createOperationContext(operation, method, args, target, targetClass);
-            return execute(invoker, context);
+            return this.execute(invoker, context);
         }
         return invoker.invoke();
     }
@@ -92,25 +98,52 @@ abstract class RedLockAspectSupport implements BeanFactoryAware, InitializingBea
         return AopProxyUtils.ultimateTargetClass(target);
     }
 
-    private Object execute(final RedLockOperationInvoker invoker, RedLockOperationContext context) {
-        Object key = generateKey(context);
-        long start = System.currentTimeMillis();
+    private Object execute(final RedLockOperationInvoker invoker, RedLockOperationContext context) throws Throwable {
+        String key = generateKey(context);
+
+        if (isBlank(key)) {
+            logger.error("obtain red lock key error");
+            throw new RedLockException("failed to get lock key");
+        }
+
+        long waitTime = context.metadata.operation.getWaitTime();
+        long leaseTime = context.metadata.operation.getLeaseTime();
+        TimeUnit timeUnit = context.metadata.operation.getTimeUnit();
+
+        boolean finallyRelease = context.metadata.operation.isFinallyRelease();
+        boolean lockResult = false;
+        RLock lock = null;
         try {
+            lock = redissonClient.getLock(key);
+            lockResult = lock.tryLock(waitTime, leaseTime, timeUnit);
+            if (!lockResult) {
+                logger.error("failed to lock with key: {}", key);
+                throw new RedLockException("failed to lock with key:" + key);
+            }
+
+            logger.debug("lock succeed with key: {}", key);
+
             return invoker.invoke();
+
+        } catch (Exception e) {
+            logger.error("an error occurred during red lock", e);
+            throw e;
         } finally {
-            System.out.println(key);
-            System.out.println("Duration : " + (System.currentTimeMillis() - start));
+            if (finallyRelease && lockResult) {
+                lock.unlock();
+                logger.info("unlock with the key: {}", key);
+            }
         }
     }
 
 
-    private Object generateKey(RedLockOperationContext context) {
+    private String generateKey(RedLockOperationContext context) {
         Object key = context.generateKey();
         if (null == key) {
             throw new IllegalArgumentException("Null key returned for redLock operation (maybe you are " +
                     "using named params on classes without debug info?) " + context.metadata.operation);
         }
-        return key;
+        return key.toString();
     }
 
 

@@ -10,11 +10,11 @@ import org.redisson.config.ClusterServersConfig;
 import org.redisson.config.Config;
 import org.redisson.config.SingleServerConfig;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Role;
 
 import java.util.List;
@@ -25,8 +25,8 @@ import static jodd.util.StringUtil.isNotBlank;
  * @author rui.zhang
  */
 @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-@Configuration
-@ConditionalOnClass({Redisson.class, RedissonClient.class})
+@AutoConfiguration
+@ConditionalOnClass({Redisson.class, RedissonClient.class, RedisProperties.class})
 @EnableConfigurationProperties(RedisProperties.class)
 public class RedLockConfiguration {
 
@@ -90,9 +90,10 @@ public class RedLockConfiguration {
 
     @Bean
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-    public RedLockInterceptor redLockInterceptor(RedLockOperationSource redLockOperationSource) {
+    public RedLockInterceptor redLockInterceptor(RedLockOperationSource redLockOperationSource, RedissonClient redissonClient) {
         RedLockInterceptor interceptor = new RedLockInterceptor();
         interceptor.setRedLockOperationSource(redLockOperationSource);
+        interceptor.setRedissonClient(redissonClient);
         return interceptor;
     }
 

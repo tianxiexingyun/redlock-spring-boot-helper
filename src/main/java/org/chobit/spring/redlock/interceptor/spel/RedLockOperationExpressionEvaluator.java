@@ -29,11 +29,12 @@ public class RedLockOperationExpressionEvaluator extends CachedExpressionEvaluat
     /**
      * Create an {@link EvaluationContext}.
      *
-     * @param method      the method
-     * @param args        the method arguments
-     * @param target      the target object
-     * @param targetClass the target class
-     * @param beanFactory the bean factory
+     * @param method       the method
+     * @param args         the method arguments
+     * @param target       the target object
+     * @param targetClass  the target class
+     * @param targetMethod the target method
+     * @param beanFactory  the bean factory
      * @return the evaluation context
      */
     public EvaluationContext createEvaluationContext(Method method,

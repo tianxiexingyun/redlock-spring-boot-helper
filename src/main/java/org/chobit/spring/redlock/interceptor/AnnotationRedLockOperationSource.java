@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Implementation of the {@link RedLockOperationSource} interface
- * for working with caching metadata in annotation format.
+ * for working with red lock metadata in annotation format.
  *
  * <p>This class reads Spring's {@link RedLock} annotations
  * and exposes corresponding redLock operation definition to Spring's infrastructure.
@@ -98,12 +98,15 @@ public class AnnotationRedLockOperationSource implements RedLockOperationSource,
         Long waitTime = attributes.getNumber("waitTime");
         Long leaseTime = attributes.getNumber("leaseTime");
         TimeUnit unit = (TimeUnit) attributes.get("timeUnit");
+        boolean finallyRelease = attributes.getBoolean("finallyRelease");
 
         RedLockOperation attr = new RedLockOperation();
         attr.setKey(key);
         attr.setWaitTime(waitTime);
         attr.setLeaseTime(leaseTime);
         attr.setTimeUnit(unit);
+        attr.setFinallyRelease(finallyRelease);
+        
         return attr;
     }
 
