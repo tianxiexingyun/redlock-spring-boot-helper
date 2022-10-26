@@ -131,7 +131,7 @@ abstract class RedLockAspectSupport implements BeanFactoryAware, InitializingBea
         } finally {
             if (finallyRelease && lockResult) {
                 lock.unlock();
-                logger.info("unlock with the key: {}", key);
+                logger.debug("unlock with the key: {}", key);
             }
         }
     }
