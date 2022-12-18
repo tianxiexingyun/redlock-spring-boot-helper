@@ -101,6 +101,8 @@ abstract class RedLockAspectSupport implements BeanFactoryAware, InitializingBea
     private Object execute(final RedLockOperationInvoker invoker, RedLockOperationContext context) throws Throwable {
         String key = generateKey(context);
 
+        logger.info("begin redisson lock with key: {}" , key);
+
         if (isBlank(key)) {
             logger.error("obtain red lock key error");
             throw new RedLockException("failed to get lock key");
@@ -133,6 +135,7 @@ abstract class RedLockAspectSupport implements BeanFactoryAware, InitializingBea
                 lock.unlock();
                 logger.debug("unlock with the key: {}", key);
             }
+            logger.info("release redisson lock with key: {}" , key);
         }
     }
 
